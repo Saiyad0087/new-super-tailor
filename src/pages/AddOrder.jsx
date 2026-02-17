@@ -20,9 +20,9 @@ export default function AddOrder() {
   const [deliveryDate, setDeliveryDate] = useState("");
 
   const [garments, setGarments] = useState({
-    shirt: false,
-    pant: false,
-    kurta: false
+    shirt: 0,
+    pant: 0,
+    kurta: 0
   });
 
   useEffect(() => {
@@ -198,29 +198,30 @@ export default function AddOrder() {
           className="p-3 rounded-xl bg-white/20 w-full"
         />
 
-        <div className="flex gap-4">
+        <div className="grid grid-cols-3 gap-4">
           {["shirt","pant","kurta"].map(g => (
-            <label key={g} className="flex items-center gap-2">
+            <div key={g} className="flex flex-col">
+              <label className="mb-1 capitalize">{g}</label>
               <input
-                type="checkbox"
-                checked={garments[g]}
-                onChange={()=>setGarments(prev=>({
+                type="number"
+                min="0"
+                value={garments[g]}
+                onChange={(e)=>setGarments(prev=>({
                   ...prev,
-                  [g]: !prev[g]
+                  [g]: Number(e.target.value)
                 }))}
+                className="p-2 rounded bg-white/20"
               />
-              {g}
-            </label>
+            </div>
           ))}
         </div>
 
         <button
           onClick={createOrder}
-          className="bg-blue-600 px-6 py-3 rounded-xl w-full"
+          className="bg-blue-500 px-6 py-2 rounded-xl w-full mt-6"
         >
           Create Order
         </button>
-
       </div>
 
     </Layout>

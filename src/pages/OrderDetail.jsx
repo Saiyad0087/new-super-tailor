@@ -132,7 +132,7 @@ export default function OrderDetail() {
       {/* MEASUREMENT GRID */}
       <div className="grid md:grid-cols-3 gap-8">
 
-        {order.garments.shirt && (
+        {order.garments.shirt > 0 && (
           <Section
             title="SHIRT"
             fields={shirtFields}
@@ -142,7 +142,7 @@ export default function OrderDetail() {
           />
         )}
 
-        {order.garments.pant && (
+        {order.garments.pant > 0 && (
           <Section
             title="PANT"
             fields={pantFields}
@@ -152,7 +152,7 @@ export default function OrderDetail() {
           />
         )}
 
-        {order.garments.kurta && (
+        {order.garments.kurta > 0 && (
           <Section
             title="KURTA"
             fields={kurtaFields}

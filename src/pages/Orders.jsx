@@ -19,12 +19,31 @@ export default function Orders() {
       }))
     );
 
-    // Sort by latest fabric received
-    allOrders.sort(
-      (a, b) =>
-        new Date(b.fabricReceivedDate) -
-        new Date(a.fabricReceivedDate)
-    );
+    const today = new Date().toISOString().split("T")[0];
+
+    allOrders.sort((a, b) => {
+
+      const aOverdue =
+        a.deliveryDate < today &&
+        a.status !== "delivered";
+
+      const bOverdue =
+        b.deliveryDate < today &&
+        b.status !== "delivered";
+
+      // 1️⃣ Overdue first
+      if (aOverdue && !bOverdue) return -1;
+      if (!aOverdue && bOverdue) return 1;
+
+      // 2️⃣ Delivered always last
+      if (a.status === "delivered" && b.status !== "delivered") return 1;
+      if (a.status !== "delivered" && b.status === "delivered") return -1;
+
+      // 3️⃣ Otherwise latest fabric date first
+      return new Date(b.fabricReceivedDate) -
+        new Date(a.fabricReceivedDate);
+    });
+
 
     setOrders(allOrders);
   }, []);
@@ -33,6 +52,12 @@ export default function Orders() {
     order.customerName.toLowerCase().includes(search.toLowerCase()) ||
     order.mobile.includes(search)
   );
+
+  const today = new Date().toISOString().split("T")[0];
+  const isOverdue = (order) => {
+    return order.deliveryDate < today &&
+      order.status !== "delivered";
+  };
 
   function getStatusDisplay(status) {
     if (status === "cutting_pending")
@@ -51,7 +76,7 @@ export default function Orders() {
       <input
         placeholder="Search by name or mobile..."
         value={search}
-        onChange={(e)=>setSearch(e.target.value)}
+        onChange={(e) => setSearch(e.target.value)}
         className="p-3 rounded-xl bg-white/20 mb-6 w-full"
       />
 
@@ -66,7 +91,11 @@ export default function Orders() {
               onClick={() =>
                 navigate(`/order-detail/${order.mobile}/${order.orderId}`)
               }
-              className="py-4 cursor-pointer hover:bg-white/5 px-2 transition"
+              className={`py-4 cursor-pointer px-2 transition ${isOverdue(order)
+                ? "bg-red-500/10 border-l-4 border-red-500"
+                : "hover:bg-white/5"
+                }`}
+
             >
               <div className="flex justify-between items-center">
 
@@ -74,10 +103,18 @@ export default function Orders() {
                   <div className="font-semibold text-lg">
                     {order.customerName}
                   </div>
+
                   <div className="text-gray-400 text-sm">
                     Fabric: {order.fabricReceivedDate}
                   </div>
+
+                  <div className="text-gray-300 text-sm mt-1">
+                    {order.garments.shirt > 0 && `Shirt: ${order.garments.shirt} `}
+                    {order.garments.pant > 0 && `Pant: ${order.garments.pant} `}
+                    {order.garments.kurta > 0 && `Kurta: ${order.garments.kurta}`}
+                  </div>
                 </div>
+
 
                 <div className={`flex items-center gap-2 ${statusInfo.color}`}>
                   <span>●</span>
