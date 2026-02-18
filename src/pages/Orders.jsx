@@ -25,19 +25,19 @@ export default function Orders() {
 
       const aOverdue =
         a.deliveryDate < today &&
-        a.status !== "delivered";
+        a.status !== "completed";
 
       const bOverdue =
         b.deliveryDate < today &&
-        b.status !== "delivered";
+        b.status !== "completed";
 
       // 1️⃣ Overdue first
       if (aOverdue && !bOverdue) return -1;
       if (!aOverdue && bOverdue) return 1;
 
-      // 2️⃣ Delivered always last
-      if (a.status === "delivered" && b.status !== "delivered") return 1;
-      if (a.status !== "delivered" && b.status === "delivered") return -1;
+      // 2️⃣ Completed always last
+      if (a.status === "completed" && b.status !== "completed") return 1;
+      if (a.status !== "completed" && b.status === "completed") return -1;
 
       // 3️⃣ Otherwise latest fabric date first
       return new Date(b.fabricReceivedDate) -
@@ -56,17 +56,24 @@ export default function Orders() {
   const today = new Date().toISOString().split("T")[0];
   const isOverdue = (order) => {
     return order.deliveryDate < today &&
-      order.status !== "delivered";
+      order.status !== "completed";
   };
 
   function getStatusDisplay(status) {
-    if (status === "cutting_pending")
-      return { color: "text-yellow-400", label: "Cutting Pending" };
-    if (status === "cutting_done")
-      return { color: "text-blue-400", label: "Cutting Done" };
-    if (status === "delivered")
-      return { color: "text-green-400", label: "Delivered" };
+
+    if (status === "fabric_cutting")
+      return { color: "text-yellow-400", label: "Fabric Cutting" };
+
+    if (status === "stitching")
+      return { color: "text-blue-400", label: "Stitching" };
+
+    if (status === "ready")
+      return { color: "text-purple-400", label: "Ready" };
+
+    if (status === "completed")
+      return { color: "text-green-400", label: "Completed" };
   }
+
 
   return (
     <Layout>

@@ -14,26 +14,36 @@ export default function Dashboard() {
   const totalCustomers = customers.length;
   const totalOrders = allOrders.length;
 
-  const cuttingPending = allOrders.filter(
-    o => o.status === "cutting_pending"
+  const fabricCutting = allOrders.filter(
+    o => o.status === "fabric_cutting"
   ).length;
 
-  const cuttingDone = allOrders.filter(
-    o => o.status === "cutting_done"
+  const stitching = allOrders.filter(
+    o => o.status === "stitching"
   ).length;
 
-  const delivered = allOrders.filter(
-    o => o.status === "delivered"
+  const ready = allOrders.filter(
+    o => o.status === "ready"
   ).length;
+
+  const completed = allOrders.filter(
+    o => o.status === "completed"
+  ).length;
+
+  const activeOrders = allOrders.filter(
+    o => o.status !== "completed"
+  ).length;
+
+
 
   const today = new Date().toISOString().split("T")[0];
 
   const overdue = allOrders.filter(
-    o => o.deliveryDate < today && o.status !== "delivered"
+    o => o.deliveryDate < today && o.status !== "completed"
   ).length;
 
   const progress = totalOrders
-    ? Math.round((delivered / totalOrders) * 100)
+    ? Math.round((completed / totalOrders) * 100)
     : 0;
 
   return (
@@ -68,17 +78,26 @@ export default function Dashboard() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-
-            <GlassCard title="Total Customers" value={totalCustomers} />
-            <GlassCard title="Total Orders" value={totalOrders} />
-            <GlassCard title="Overdue Orders" value={overdue} red />
-
-            <GlassCard title="Cutting Pending" value={cuttingPending} />
-            <GlassCard title="Cutting Done" value={cuttingDone} />
-            <GlassCard title="Delivered" value={delivered} green />
-
+          {/* ROW 1 – WORK FOCUS */}
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <GlassCard title="Active Orders" value={activeOrders} highlight />
+            <GlassCard title="Overdue Orders" value={overdue} red highlight />
+            <GlassCard title="Ready for Delivery" value={ready} green highlight />
           </div>
+
+          {/* ROW 2 – PRODUCTION FLOW */}
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            <GlassCard title="Fabric Cutting" value={fabricCutting} />
+            <GlassCard title="Stitching" value={stitching} />
+            <GlassCard title="Completed" value={completed} />
+          </div>
+
+          {/* ROW 3 – BUSINESS STATS */}
+          <div className="grid md:grid-cols-2 gap-6">
+            <GlassCard title="Total Orders" value={totalOrders} />
+            <GlassCard title="Total Customers" value={totalCustomers} />
+          </div>
+
 
         </div>
 
@@ -98,10 +117,10 @@ export default function Dashboard() {
 
           <div className="mt-8 text-center">
             <p className="text-green-400 text-lg">
-              Delivered: {delivered}
+              completed: {completed}
             </p>
             <p className="text-yellow-400 text-lg">
-              Pending: {cuttingPending + cuttingDone}
+              Pending: {fabricCutting + stitching + ready}
             </p>
           </div>
 
@@ -114,27 +133,22 @@ export default function Dashboard() {
 }
 
 /* GLASS CARD */
-function GlassCard({ title, value, red, green }) {
+function GlassCard({ title, value, red, green, highlight }) {
   return (
-    <div className="relative group bg-white/10 backdrop-blur-xl border border-white/20 group-hover:border-white/40 rounded-2xl p-6 shadow-[0_20px_50px_rgba(0,0,0,0.4)] transition duration-500 hover:-translate-y-2 hover:shadow-[0_25px_60px_rgba(0,0,0,0.6)] overflow-hidden">
+    <div className={`relative group backdrop-blur-xl border rounded-2xl p-6 transition duration-500 overflow-hidden
+      ${highlight 
+        ? "bg-white/15 shadow-[0_25px_70px_rgba(0,0,0,0.6)] scale-105" 
+        : "bg-white/10 shadow-[0_15px_40px_rgba(0,0,0,0.4)]"}
+      ${red ? "border-red-400/40" : green ? "border-green-400/40" : "border-white/20"}
+      hover:-translate-y-2 hover:shadow-[0_30px_80px_rgba(0,0,0,0.7)]`}
+    >
 
-      {/* INNER GLOW LIGHT */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition duration-500 bg-gradient-to-br from-white/10 to-transparent rounded-2xl pointer-events-none"></div>
-
-      {/* Shine Sweep */}
-      <div className="absolute -inset-1 opacity-0 group-hover:opacity-100 transition duration-700 pointer-events-none">
-        <div className="w-1/3 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent rotate-12 translate-x-[-200%] group-hover:translate-x-[300%] transition-transform duration-1000"></div>
-      </div>
-
-      {/* Depth Layer */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-blue-500/5 to-indigo-500/5 blur-xl -z-10 scale-110"></div>
-
-      <p className="text-gray-300 mb-3 relative z-10">
+      <p className="text-gray-300 mb-3">
         {title}
       </p>
 
       <p
-        className={`text-4xl font-bold relative z-10 ${
+        className={`text-4xl font-bold ${
           red
             ? "text-red-400"
             : green
@@ -148,6 +162,7 @@ function GlassCard({ title, value, red, green }) {
     </div>
   );
 }
+
 
 
 /* CIRCULAR PROGRESS */
@@ -193,7 +208,7 @@ function CircularProgress({ percentage }) {
           </linearGradient>
         </defs>
       </svg>
-      
+
       {/* Outer Glow */}
       <div className="absolute w-[220px] h-[220px] bg-emerald-400/10 blur-3xl rounded-full"></div>
 

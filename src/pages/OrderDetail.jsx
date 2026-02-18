@@ -61,13 +61,13 @@ export default function OrderDetail() {
           orders: c.orders.map(o =>
             String(o.orderId) === orderId
               ? {
-                  ...o,
-                  status: newStatus,
-                  deliveredDate:
-                    newStatus === "delivered"
-                      ? new Date().toISOString().split("T")[0]
-                      : null
-                }
+                ...o,
+                status: newStatus,
+                deliveredDate:
+                  newStatus === "delivered"
+                    ? new Date().toISOString().split("T")[0]
+                    : null
+              }
               : o
           )
         };
@@ -82,18 +82,18 @@ export default function OrderDetail() {
   if (!customer || !order) return null;
 
   const shirtFields = [
-    "collar","chest","waist","shoulder",
-    "fullSleeve","halfSleeve","length","other"
+    "collar", "chest", "waist", "shoulder",
+    "fullSleeve", "halfSleeve", "length", "other"
   ];
 
   const pantFields = [
-    "waist","inseam","outseam","seat",
-    "rise","thigh","knee","opening","other"
+    "waist", "inseam", "outseam", "seat",
+    "rise", "thigh", "knee", "opening", "other"
   ];
 
   const kurtaFields = [
-    "collar","shoulder","chest","waist",
-    "hip","bottom","sleeve","cuff","length","other"
+    "collar", "shoulder", "chest", "waist",
+    "hip", "bottom", "sleeve", "cuff", "length", "other"
   ];
 
   return (
@@ -138,7 +138,7 @@ export default function OrderDetail() {
             fields={shirtFields}
             data={customer.measurements.shirt}
             editMode={editMode}
-            update={(f,v)=>updateMeasurement("shirt",f,v)}
+            update={(f, v) => updateMeasurement("shirt", f, v)}
           />
         )}
 
@@ -148,7 +148,7 @@ export default function OrderDetail() {
             fields={pantFields}
             data={customer.measurements.pant}
             editMode={editMode}
-            update={(f,v)=>updateMeasurement("pant",f,v)}
+            update={(f, v) => updateMeasurement("pant", f, v)}
           />
         )}
 
@@ -158,7 +158,7 @@ export default function OrderDetail() {
             fields={kurtaFields}
             data={customer.measurements.kurta}
             editMode={editMode}
-            update={(f,v)=>updateMeasurement("kurta",f,v)}
+            update={(f, v) => updateMeasurement("kurta", f, v)}
           />
         )}
 
@@ -174,27 +174,37 @@ export default function OrderDetail() {
       )}
 
       {/* STATUS BUTTONS */}
-      <div className="mt-12 flex gap-6">
+      <div className="mt-12 flex gap-4 flex-wrap">
 
-        {order.status === "cutting_pending" && (
+        {order.status === "fabric_cutting" && (
           <button
-            onClick={() => updateStatus("cutting_done")}
+            onClick={() => updateStatus("stitching")}
             className="bg-blue-600 px-6 py-3 rounded-xl"
           >
-            Mark Cutting Done
+            Move to Stitching
           </button>
         )}
 
-        {order.status === "cutting_done" && (
+        {order.status === "stitching" && (
           <button
-            onClick={() => updateStatus("delivered")}
+            onClick={() => updateStatus("ready")}
+            className="bg-purple-600 px-6 py-3 rounded-xl"
+          >
+            Mark as Ready
+          </button>
+        )}
+
+        {order.status === "ready" && (
+          <button
+            onClick={() => updateStatus("completed")}
             className="bg-green-600 px-6 py-3 rounded-xl"
           >
-            Mark Delivered
+            Mark as Completed
           </button>
         )}
 
       </div>
+
 
     </div>
   );
@@ -220,7 +230,7 @@ function Section({ title, fields, data, editMode, update }) {
             {editMode ? (
               <input
                 value={data[field] || ""}
-                onChange={(e)=>update(field,e.target.value)}
+                onChange={(e) => update(field, e.target.value)}
                 className="bg-white/20 px-2 py-1 rounded"
               />
             ) : (

@@ -76,7 +76,7 @@ export default function AddOrder() {
       deliveryDate: deliveryDate,
       deliveredDate: null,
       garments,
-      status: "cutting_pending"
+      status: "fabric_cutting"
     };
 
     if (existing) {
